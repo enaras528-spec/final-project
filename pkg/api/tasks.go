@@ -11,11 +11,12 @@ func tasksHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 		return
 	}
+	const limit = 50
 	search := r.FormValue("search")
 
-	tasks, err := db.Tasks(search, 50)
+	tasks, err := db.Tasks(search, limit)
 	if err != nil {
-		sendError(w, "Ошибка при получении списка задач")
+		sendError(w, "Ошибка при получении списка задач", http.StatusBadRequest)
 		return
 	}
 	sendJSON(w, http.StatusOK, map[string]any{

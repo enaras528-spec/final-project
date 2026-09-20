@@ -20,6 +20,9 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 	}
 
 	parts := strings.Fields(repeat)
+	if len(parts) == 0 {
+		return "", fmt.Errorf("неправильное правило повторения")
+	}
 	rule := parts[0]
 
 	switch rule {

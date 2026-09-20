@@ -15,20 +15,20 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 	if id == "" {
-		sendError(w, "Не указан идентификатор задачи")
+		sendError(w, "Не указан идентификатор задачи", http.StatusBadRequest)
 		return
 	}
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		sendError(w, "Задача не найдена")
+		sendError(w, "Задача не найдена", http.StatusBadRequest)
 		return
 	}
 
 	if task.Repeat == "" {
 		err = db.DeleteTask(id)
 		if err != nil {
-			sendError(w, "Ошибка при удалении задачи")
+			sendError(w, "Ошибка при удалении задачи", http.StatusBadRequest)
 			return
 		}
 	} else {
@@ -37,13 +37,13 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 		nextDate, err := NextDate(today, task.Date, task.Repeat)
 		if err != nil {
-			sendError(w, "Ошибка при вычислении следующей даты")
+			sendError(w, "Ошибка при вычислении следующей даты", http.StatusBadRequest)
 			return
 		}
 
 		err = db.UpdateTaskDate(id, nextDate)
 		if err != nil {
-			sendError(w, "Ошибка при обновлении задачи")
+			sendError(w, "Ошибка при обновлении задачи", http.StatusBadRequest)
 			return
 		}
 	}
@@ -53,13 +53,13 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	if id == "" {
-		sendError(w, "Не указан идентификатор задачи")
+		sendError(w, "Не указан идентификатор задачи", http.StatusBadRequest)
 		return
 	}
 
 	err := db.DeleteTask(id)
 	if err != nil {
-		sendError(w, "Задача не найдена")
+		sendError(w, "Задача не найдена", http.StatusBadRequest)
 		return
 	}
 

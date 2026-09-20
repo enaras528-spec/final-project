@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"os"
 
 	_ "modernc.org/sqlite"
 )
@@ -10,34 +9,34 @@ import (
 var DB *sql.DB
 
 const schema = `
-CREATE TABLE scheduler (
+CREATE TABLE IF NOT EXISTS scheduler (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     date CHAR(8) NOT NULL DEFAULT "",
     title VARCHAR(256) NOT NULL DEFAULT "",
     comment TEXT NOT NULL DEFAULT "",
     repeat VARCHAR(128) NOT NULL DEFAULT ""
 );
-CREATE INDEX idx_scheduler_date ON scheduler (date);
+CREATE INDEX IF NOT EXISTS idx_scheduler_date ON scheduler (date);
 `
 
-func Init(dbFIle string) error {
-	_, err := os.Stat(dbFIle)
-	var install bool
+func Init(dbFile string) error {
+	var err error
+	DB, err = sql.Open("sqlite", dbFile)
 	if err != nil {
-		install = true
+		return err
 	}
 
-	var dbErr error
-	DB, dbErr = sql.Open("sqlite", dbFIle)
-	if dbErr != nil {
-		return dbErr
+	_, err = DB.Exec(schema)
+	if err != nil {
+		DB.Close()
+		return err
 	}
 
-	if install {
-		_, err = DB.Exec(schema)
-		if err != nil {
-			return err
-		}
+	return nil
+}
+func Close() error {
+	if DB != nil {
+		return DB.Close()
 	}
 	return nil
 }

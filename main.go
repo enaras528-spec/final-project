@@ -20,6 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Ошибка при инициализации БД: %v", err)
 	}
+	defer db.Close()
 
 	api.Init()
 
